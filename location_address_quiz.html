@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบทดสอบ Location และการอ่าน Address (15 ข้อ)</title>
+<style>
+  :root {
+    --primary: #0082c3;
+    --primary-dark: #006699;
+    --primary-light: #e6f4fb;
+    --accent: #368727;
+    --bg: #f4f7fa;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --success: #16a34a;
+    --success-bg: #dcfce7;
+    --danger: #dc2626;
+    --danger-bg: #fee2e2;
+    --warn: #d97706;
+    --warn-bg: #fef3c7;
+    --radius: 14px;
+    --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Sarabun", "Noto Sans Thai", "Tahoma", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 16px;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-badge {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+  }
+  .brand h1 {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+  .btn-outline {
+    background: #fff;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+  }
+  .btn-outline:hover { background: var(--primary-light); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: #f1f5f9; color: var(--text); }
+  .btn-sm { padding: 7px 13px; font-size: 13.5px; }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+    border: 1px solid var(--border);
+  }
+
+  /* Start Screen */
+  .hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .hero-sub {
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .info-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .info-box .num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .info-box .lbl {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .input-text {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .input-text:focus { border-color: var(--primary); }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 22px;
+    font-size: 14.5px;
+  }
+  .toggle-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  /* Quiz Screen */
+  .progress-wrap {
+    margin-bottom: 18px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 9px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+  .q-tag {
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 15px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: #f8fbff;
+  }
+  .option-btn:disabled { cursor: default; }
+  .opt-letter {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .option-btn.correct {
+    border-color: var(--success);
+    background: var(--success-bg);
+  }
+  .option-btn.correct .opt-letter {
+    background: var(--success);
+    color: #fff;
+  }
+  .option-btn.wrong {
+    border-color: var(--danger);
+    background: var(--danger-bg);
+  }
+  .option-btn.wrong .opt-letter {
+    background: var(--danger);
+    color: #fff;
+  }
+  .hint-box {
+    background: var(--warn-bg);
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .feedback-box {
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 14.5px;
+  }
+  .feedback-box.ok {
+    background: var(--success-bg);
+    border: 1px solid #86efac;
+    color: #14532d;
+  }
+  .feedback-box.err {
+    background: var(--danger-bg);
+    border: 1px solid #fca5a5;
+    color: #7f1d1d;
+  }
+  .feedback-title {
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .quiz-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  /* Result Screen */
+  .score-banner {
+    text-align: center;
+    padding: 20px 10px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .score-circle {
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    border: 6px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .score-circle .big {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    line-height: 1.1;
+  }
+  .score-circle .small {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: #fff;
+  }
+  .review-item.r-ok { border-left: 5px solid var(--success); }
+  .review-item.r-err { border-left: 5px solid var(--danger); }
+  .review-q { font-weight: 700; margin-bottom: 6px; font-size: 15px; }
+  .review-ans { font-size: 14px; margin-bottom: 4px; }
+  .review-exp { font-size: 13.5px; color: var(--muted); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1000;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .modal-head h2 {
+    font-size: 19px;
+    color: var(--accent);
+  }
+  .ref-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 14px 0 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-bottom: 12px;
+  }
+  th {
+    background: #3346b0;
+    color: #fff;
+    padding: 8px 6px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+  }
+  td {
+    padding: 7px 6px;
+    text-align: center;
+    border: 1px solid #cbd5e1;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .note-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: #0c4a6e;
+    margin-bottom: 10px;
+  }
+  .note-box ul { margin-left: 18px; margin-top: 4px; }
+  .addr-demo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    background: #0f172a;
+    color: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-family: monospace;
+  }
+  .addr-chip {
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+  }
+  .addr-chip .code { font-size: 16px; font-weight: 800; color: #38bdf8; }
+  .addr-chip .desc { font-size: 11.5px; color: #cbd5e1; font-family: sans-serif; }
+
+  .hidden { display: none !important; }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 2000;
+  }
+  .toast.show { opacity: 1; }
+  @media (max-width: 520px) {
+    .card { padding: 18px; }
+    .q-text { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <span class="brand-badge">CHAPTER 2 QUIZ</span>
+      <h1>แบบทดสอบ Location และการอ่าน Address</h1>
+    </div>
+    <button class="btn btn-outline btn-sm" id="openRefBtn">📘 คู่มืออ้างอิง</button>
+  </header>
+
+  <!-- Start Screen -->
+  <section id="startScreen" class="card">
+    <h2 class="hero-title">วัดความเข้าใจ Location และการอ่านรหัส Address</h2>
+    <p class="hero-sub">
+      ครอบคลุมการอ่านรหัสตำแหน่ง (Address) ทั้ง 6 ส่วนบนหน้าจอ Logpad ความหมายของโซน P / R / M การเลือกหยิบ Cont จากหน้าจอระบบจริง โครงสร้างคลัง B1–B3 และการแบ่งชั้น Mezzanine
+    </p>
+    <div class="info-grid">
+      <div class="info-box"><div class="num">15</div><div class="lbl">จำนวนข้อสอบ</div></div>
+      <div class="info-box"><div class="num">4 ตัวเลือก</div><div class="lbl">สุ่มลำดับอัตโนมัติ</div></div>
+      <div class="info-box"><div class="num">เฉลยทันที</div><div class="lbl">พร้อมคำอธิบายเหตุผล</div></div>
+    </div>
+    <div class="form-group">
+      <label for="userName">ชื่อผู้ทำแบบทดสอบ (ไม่บังคับ — ใช้แสดงตอนคัดลอกผลคะแนน)</label>
+      <input type="text" id="userName" class="input-text" placeholder="เช่น สมชาย / ทีม Picking">
+    </div>
+    <div class="toggle-row">
+      <span>สลับลำดับข้อคำถามทุกครั้งที่เริ่มทำ</span>
+      <input type="checkbox" id="shuffleToggle" checked>
+    </div>
+    <button class="btn btn-primary" id="startBtn" style="width:100%; padding:13px;">เริ่มทำแบบทดสอบ</button>
+  </section>
+
+  <!-- Quiz Screen -->
+  <section id="quizScreen" class="card hidden">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="qCounter">ข้อที่ 1 / 15</span>
+        <span id="scoreLive">คะแนนสะสม: 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <span class="q-tag" id="qCategory">หมวดหมู่</span>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="optionsBox"></div>
+
+    <div class="hint-box hidden" id="hintBox"></div>
+    <div class="feedback-box hidden" id="feedbackBox">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div id="feedbackReason"></div>
+    </div>
+
+    <div class="quiz-footer">
+      <button class="btn btn-ghost btn-sm" id="hintBtn">💡 ดูคำใบ้</button>
+      <button class="btn btn-primary hidden" id="nextBtn">ข้อถัดไป →</button>
+    </div>
+  </section>
+
+  <!-- Result Screen -->
+  <section id="resultScreen" class="card hidden">
+    <div class="score-banner">
+      <div class="score-circle">
+        <div class="big" id="finalScore">0/15</div>
+        <div class="small" id="finalPct">0%</div>
+      </div>
+      <h2 id="resultHeading" style="font-size:21px; margin-bottom:4px;">สรุปผลคะแนน</h2>
+      <p id="resultSub" style="color:var(--muted); font-size:14.5px;"></p>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="copyResultBtn">📋 คัดลอกผลคะแนนส่งแชท</button>
+        <button class="btn btn-outline" id="retryBtn">🔄 ทำแบบทดสอบอีกครั้ง</button>
+      </div>
+    </div>
+
+    <div class="filter-tabs">
+      <button class="btn btn-sm btn-primary" id="filterAll">ทั้งหมด (15)</button>
+      <button class="btn btn-sm btn-ghost" id="filterWrong">เฉพาะข้อที่ผิด (0)</button>
+    </div>
+    <div id="reviewList"></div>
+  </section>
+</div>
+
+<!-- Reference Modal -->
+<div class="modal-backdrop" id="refModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>คู่มืออ้างอิง: Location & การอ่าน Address</h2>
+      <button class="btn btn-ghost btn-sm" id="closeRefBtn">✕ ปิด</button>
+    </div>
+
+    <div class="ref-section-title">1. โครงสร้าง Address 6 ส่วน (ตัวอย่าง: B1PK - 14 - 2 - 1)</div>
+    <div class="addr-demo">
+      <div class="addr-chip"><div class="code">B1</div><div class="desc">WH (คลังสินค้า)</div></div>
+      <div class="addr-chip"><div class="code">P</div><div class="desc">Zone (โซน)</div></div>
+      <div class="addr-chip"><div class="code">K</div><div class="desc">Roll (แถว)</div></div>
+      <div class="addr-chip"><div class="code">14</div><div class="desc">BAY (ล็อก)</div></div>
+      <div class="addr-chip"><div class="code">2</div><div class="desc">Column (ช่อง)</div></div>
+      <div class="addr-chip"><div class="code">1</div><div class="desc">Layers (ชั้น)</div></div>
+    </div>
+
+    <div class="note-box">
+      <strong>ความหมายของรหัสโซน (Zone):</strong>
+      <ul>
+        <li><strong>P = Picking</strong> (โซนหยิบสินค้า)</li>
+        <li><strong>R = Replenishment</strong> (โซนเติมสินค้า/สต็อกสำรอง)</li>
+        <li><strong>M = Mezzanine</strong> (โซนชั้นลอย — สามารถหยิบสินค้าได้)</li>
+      </ul>
+    </div>
+
+    <div class="ref-section-title">2. ข้อมูล Location (3 คลัง) และชั้น Mezzanine</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Location / พื้นที่</th>
+          <th>รายละเอียด Section / แถว (Roll)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Warehouse 1 (B1)</td><td>Sec 86 Marketplace, Sec 87</td></tr>
+        <tr><td>Warehouse 2 (B2)</td><td>Sec 87, Sec 89</td></tr>
+        <tr><td>Warehouse 3 (B3)</td><td>Warehouse 3 + Mezzanine 3 ชั้น</td></tr>
+        <tr><td>Mezzanine ชั้น 1</td><td>แถว A – G</td></tr>
+        <tr><td>Mezzanine ชั้น 2</td><td>แถว H – N</td></tr>
+        <tr><td>Mezzanine ชั้น 3</td><td>แถว O – U</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ref-section-title">3. ตัวอย่างหน้าจอระบบจริง (Art: 4388811)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Cont.</th>
+          <th>Qté</th>
+          <th>Adresse</th>
+          <th>การอ่านตำแหน่ง</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>442477</td><td>127</td><td>B1MS2343</td><td>B1 / Mezzanine / แถว S / BAY 23 / ช่อง 4 / ชั้น 3</td></tr>
+        <tr><td>442489</td><td>150</td><td>B1RB0225</td><td>B1 / Replenishment / แถว B / BAY 02 / ช่อง 2 / ชั้น 5</td></tr>
+        <tr><td>462858</td><td>150</td><td>B2RK1823</td><td>B2 / Replenishment / แถว K / BAY 18 / ช่อง 2 / ชั้น 3</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast">คัดลอกผลคะแนนแล้ว!</div>
+
+<script>
+const QUESTIONS = [
+  {
+    category: "โครงสร้าง Address (6 ส่วน)",
+    q: "โครงสร้างการอ่านรหัสตำแหน่ง (Address) บนหน้าจอ Logpad เช่น 'B1PK - 14 - 2 - 1' เรียงลำดับองค์ประกอบ 6 ส่วนจากซ้ายไปขวาอย่างไร?",
+    options: [
+      { text: "WH (คลังสินค้า) → Zone (โซน) → Roll (แถว) → BAY (ล็อก) → Column (ช่อง) → Layers (ชั้น)", ok: true, why: "ถูกต้อง! B1 = WH (คลังสินค้า), P = Zone (โซน), K = Roll (แถว), 14 = BAY (ล็อก), 2 = Column (ช่อง) และ 1 = Layers (ชั้น)" },
+      { text: "WH (คลังสินค้า) → Roll (แถว) → Zone (โซน) → BAY (ล็อก) → Layers (ชั้น) → Column (ช่อง)", ok: false, why: "สลับตำแหน่งครับ ตัวอักษรตัวแรกหลัง WH คือ Zone (โซน) ไม่ใช่ Roll และตัวเลขท้ายสุดคือ Layers (ชั้น)" },
+      { text: "Zone (โซน) → WH (คลังสินค้า) → Roll (แถว) → Column (ช่อง) → BAY (ล็อก) → Layers (ชั้น)", ok: false, why: "รหัสจะขึ้นต้นด้วย WH (B1/B2/B3) เสมอ และตามด้วย Zone → Roll → BAY → Column → Layers" },
+      { text: "WH (คลังสินค้า) → Zone (โซน) → BAY (ล็อก) → Roll (แถว) → Column (ช่อง) → Layers (ชั้น)", ok: false, why: "หลัง Zone จะเป็นตัวอักษร Roll (แถว) ก่อน แล้วจึงตามด้วยตัวเลข BAY (ล็อก)" }
+    ],
+    hint: "ไล่จากซ้ายไปขวา: B1 → P → K → 14 → 2 → 1"
+  },
+  {
+    category: "ความหมายของ Zone (P / R / M)",
+    q: "ในตำแหน่ง Zone ของรหัส Address ตัวอักษร 'P', 'R' และ 'M' ย่อมาจากอะไรและมีความหมายว่าอย่างไรตามลำดับ?",
+    options: [
+      { text: "Picking (โซนหยิบสินค้า), Replenishment (โซนเติมสินค้า/สต็อกสำรอง), Mezzanine (โซนชั้นลอย)", ok: true, why: "ถูกต้อง! P = Picking, R = Replenishment และ M = Mezzanine" },
+      { text: "Packing (โซนแพ็กสินค้า), Return (โซนรับคืนสินค้า), Main (โซนคลังหลัก)", ok: false, why: "ไม่ใช่ครับ P คือ Picking (หยิบสินค้า), R คือ Replenishment (เติมสต็อก) และ M คือ Mezzanine (ชั้นลอย)" },
+      { text: "Pallet (โซนพาเลท), Receiving (โซนรับสินค้าเข้า), Moving (โซนเคลื่อนย้าย)", ok: false, why: "คำแปลเหล่านี้ไม่ตรงกับรหัสโซนในระบบครับ" },
+      { text: "Picking (โซนหยิบสินค้า), Reserve (โซนกักกันสินค้า), Marketplace (โซนมาร์เก็ตเพลส)", ok: false, why: "P ถูกต้อง แต่ R ย่อมาจาก Replenishment และ M ย่อมาจาก Mezzanine ครับ" }
+    ],
+    hint: "P คือการหยิบของ, R คือการเติมสต็อก, M คือพื้นที่ชั้นลอย 3 ชั้น"
+  },
+  {
+    category: "การอ่านตัวเลขท้าย Address",
+    q: "จากรหัสตำแหน่ง 'B1PK - 14 - 2 - 1' ตัวเลข '14', '2' และ '1' หมายถึงองค์ประกอบใดตามลำดับ?",
+    options: [
+      { text: "BAY (ล็อก) 14, Column (ช่อง) 2, Layers (ชั้น) 1", ok: true, why: "ถูกต้อง! ตัวเลข 3 ชุดท้ายเรียงจาก BAY (ล็อก) → Column (ช่อง) → Layers (ชั้น)" },
+      { text: "Column (ช่อง) 14, BAY (ล็อก) 2, Layers (ชั้น) 1", ok: false, why: "สลับกันครับ ตัวเลข 2 หลักแรก (14) คือ BAY (ล็อก) ส่วนเลขถัดไปคือ Column (ช่อง)" },
+      { text: "BAY (ล็อก) 14, Layers (ชั้น) 2, Column (ช่อง) 1", ok: false, why: "เลขตัวสุดท้าย (1) คือ Layers (ชั้น) ไม่ใช่ตัวกลางครับ" },
+      { text: "Roll (แถว) 14, BAY (ล็อก) 2, Column (ช่อง) 1", ok: false, why: "Roll (แถว) ในรหัสนี้คือตัวอักษร 'K' ไม่ใช่ตัวเลข 14 ครับ" }
+    ],
+    hint: "เรียงจากหน่วยใหญ่ไปหาชั้นวาง: ล็อก → ช่อง → ชั้น"
+  },
+  {
+    category: "ประยุกต์จากหน้าจอระบบจริง",
+    q: "จากหน้าจอระบบของสินค้า (Art) 4388811 ที่มี 3 คอนเทนเนอร์ ได้แก่ Cont 442477 (B1MS2343), Cont 442489 (B1RB0225) และ Cont 462858 (B2RK1823) หากต้องการไปหยิบสินค้าต้องเลือก Cont ใดและเพราะเหตุใด?",
+    options: [
+      { text: "Cont 442477 เพราะอยู่โซน Mezzanine (M) ที่สามารถหยิบสินค้าได้ ส่วนอีก 2 Cont อยู่โซน Replenishment (R)", ok: true, why: "ถูกต้อง! Cont 442477 อยู่ในโซน M (Mezzanine) ซึ่งเป็นพื้นที่หยิบสินค้า ส่วนอีก 2 Cont อยู่ในโซน R (Replenishment/สต็อกสำรอง)" },
+      { text: "Cont 442489 เพราะอยู่คลัง B1 และมีจำนวนสินค้า 150 ชิ้นมากกว่า Cont 442477", ok: false, why: "Cont 442489 อยู่ในโซน R (Replenishment) ซึ่งเป็นโซนเติมสินค้า ไม่ใช่โซนหยิบสินค้า" },
+      { text: "Cont 462858 เพราะอยู่คลัง B2 โซน R ที่พร้อมสำหรับการหยิบออกทันที", ok: false, why: "โซน R คือ Replenishment (โซนเติมสินค้า/สต็อกสำรอง) ไม่ใช่โซนหยิบสินค้า" },
+      { text: "หยิบจาก Cont ใดก็ได้ทั้ง 3 รายการ เพราะมีรหัสสินค้า (Art) 4388811 เหมือนกัน", ok: false, why: "ต้องดูรหัส Zone ด้วยครับ การหยิบสินค้าจะไปหยิบจากโซนหยิบ (P หรือ M) ไม่ใช่โซนสต็อกสำรอง (R)" }
+    ],
+    hint: "สังเกตตัวอักษรตัวที่ 3 (Zone) ของแต่ละ Adresse: B1[M]S2343, B1[R]B0225, B2[R]K1823"
+  },
+  {
+    category: "การอ่านรหัสตำแหน่งจริง",
+    q: "จากหน้าจอระบบคลังสินค้าจริง รหัสตำแหน่ง 'B2RK1823' ระบุว่าสินค้านี้อยู่ในคลังสินค้า (WH) และโซน (Zone) ใด?",
+    options: [
+      { text: "Warehouse 2 (B2), โซน Replenishment", ok: true, why: "ถูกต้อง! B2 = Warehouse 2 และ R = โซน Replenishment" },
+      { text: "Warehouse 2 (B2), โซน Picking", ok: false, why: "ตัวอักษรที่ตำแหน่ง Zone คือ 'R' (Replenishment) ไม่ใช่ 'P' (Picking)" },
+      { text: "Warehouse 1 (B1), โซน Replenishment", ok: false, why: "รหัสขึ้นต้นด้วย B2 คือ Warehouse 2 ครับ" },
+      { text: "Warehouse 2 (B2), โซน Mezzanine", ok: false, why: "โซน Mezzanine ใช้ตัวอักษร 'M' ไม่ใช่ 'R'" }
+    ],
+    hint: "ดู 3 ตัวอักษรแรกของรหัส B2RK1823"
+  },
+  {
+    category: "การอ่านตัวเลขตำแหน่งจริง",
+    q: "จากรหัสตำแหน่งจริง 'B1RB0225' ตัวเลข 4 หลักสุดท้าย '0225' หมายถึงตำแหน่งใด?",
+    options: [
+      { text: "BAY (ล็อก) 02, Column (ช่อง) 2, Layers (ชั้น) 5", ok: true, why: "ถูกต้อง! เลข 4 หลักแบ่งเป็น 2-1-1 คือ BAY 02, Column 2 และ Layers 5" },
+      { text: "BAY (ล็อก) 02, Column (ช่อง) 25", ok: false, why: "เลข 2 ตัวสุดท้ายต้องแยกเป็น Column (ช่อง) 1 หลัก และ Layers (ชั้น) 1 หลักครับ" },
+      { text: "BAY (ล็อก) 22, Column (ช่อง) 0, Layers (ชั้น) 5", ok: false, why: "2 หลักแรกคือ 02 (BAY 02) ไม่ใช่ 22 ครับ" },
+      { text: "Column (ช่อง) 02, BAY (ล็อก) 2, Layers (ชั้น) 5", ok: false, why: "BAY (ล็อก) จะมาก่อน Column (ช่อง) เสมอครับ" }
+    ],
+    hint: "แยกตัวเลข 4 หลัก '0225' ออกเป็นรูปแบบ 2 หลัก - 1 หลัก - 1 หลัก"
+  },
+  {
+    category: "ข้อมูล Location (B1–B3)",
+    q: "ตามข้อมูลหน้า Location คลังสินค้า Warehouse 1 (B1) ครอบคลุม Section ใดบ้าง?",
+    options: [
+      { text: "Sec 86 Marketplace และ Sec 87", ok: true, why: "ถูกต้อง! Warehouse 1 (B1) ครอบคลุม Sec 86 Marketplace และ Sec 87" },
+      { text: "Sec 87 และ Sec 89", ok: false, why: "Sec 87 และ Sec 89 เป็นพื้นที่ของ Warehouse 2 (B2) ครับ" },
+      { text: "Sec 86 Marketplace และ Sec 89", ok: false, why: "Sec 89 อยู่ที่ Warehouse 2 (B2) ไม่ใช่ B1 ครับ" },
+      { text: "Sec 86, Sec 87 และ Mezzanine 3 ชั้น", ok: false, why: "Mezzanine 3 ชั้นถูกจัดรวมอยู่กับ Warehouse 3 (B3) ครับ" }
+    ],
+    hint: "ทบทวนรายการ Section ของ Warehouse 1 (B1)"
+  },
+  {
+    category: "ข้อมูล Location (B1–B3)",
+    q: "หากต้องไปตรวจสอบสินค้าที่อยู่ใน 'Sec 89' จะต้องไปที่คลังสินค้า (Location) ใด?",
+    options: [
+      { text: "Warehouse 2 (B2)", ok: true, why: "ถูกต้อง! Sec 89 อยู่ในความรับผิดชอบของ Warehouse 2 (B2)" },
+      { text: "Warehouse 1 (B1)", ok: false, why: "Warehouse 1 (B1) มีเฉพาะ Sec 86 Marketplace และ Sec 87" },
+      { text: "Warehouse 3 (B3)", ok: false, why: "Warehouse 3 (B3) เป็นคลัง 3 และพื้นที่ Mezzanine 3 ชั้น" },
+      { text: "Mezzanine ชั้น 3", ok: false, why: "Mezzanine ชั้น 3 แบ่งตามแถว O–U ไม่ได้ระบุเป็น Sec 89 ครับ" }
+    ],
+    hint: "คลังใดที่มี Sec 87 และ 89?"
+  },
+  {
+    category: "ข้อมูล Location (B1–B3)",
+    q: "Section ใดที่มีอยู่ในทั้ง Warehouse 1 (B1) และ Warehouse 2 (B2)?",
+    options: [
+      { text: "Sec 87", ok: true, why: "ถูกต้อง! B1 มี Sec 86 Marketplace, 87 และ B2 มี Sec 87, 89 ดังนั้น Sec 87 มีอยู่ในทั้งสองคลัง" },
+      { text: "Sec 86 Marketplace", ok: false, why: "Sec 86 Marketplace มีเฉพาะที่ Warehouse 1 (B1)" },
+      { text: "Sec 89", ok: false, why: "Sec 89 มีเฉพาะที่ Warehouse 2 (B2)" },
+      { text: "ไม่มี Section ใดที่ซ้ำกันระหว่างสองคลัง", ok: false, why: "มีครับ คือ Sec 87 ที่ปรากฏในทั้ง B1 และ B2" }
+    ],
+    hint: "เทียบรายการ Section ของ B1 กับ B2 ดูว่าเลขไหนซ้ำกัน"
+  },
+  {
+    category: "ข้อมูล Location (Mezzanine)",
+    q: "ตามข้อมูล Location พื้นที่ Mezzanine ทั้ง 3 ชั้น ถูกจัดรวมอยู่กับคลังสินค้า (Location) ใด?",
+    options: [
+      { text: "Warehouse 3 (B3)", ok: true, why: "ถูกต้อง! ตามหน้า Location ระบุว่า 'Warehouse 3 (B3) + Mezzanine 3 ชั้น'" },
+      { text: "Warehouse 1 (B1)", ok: false, why: "B1 ระบุเป็น Sec 86 Marketplace, 87 ครับ" },
+      { text: "Warehouse 2 (B2)", ok: false, why: "B2 ระบุเป็น Sec 87, 89 ครับ" },
+      { text: "แยกเป็น Location ที่ 4 ต่างหาก ไม่ขึ้นกับ B1–B3", ok: false, why: "ในสไลด์ระบุชัดเจนว่ามี 3 Location โดย Mezzanine 3 ชั้นรวมอยู่กับ Warehouse 3 (B3)" }
+    ],
+    hint: "ดูบรรทัดที่ 3 ของหัวข้อ Location"
+  },
+  {
+    category: "การแบ่งชั้น Mezzanine",
+    q: "แถว (Roll) ใดต่อไปนี้ที่ตั้งอยู่บน 'Mezzanine ชั้น 1'?",
+    options: [
+      { text: "แถว F", ok: true, why: "ถูกต้อง! Mezzanine ชั้น 1 ครอบคลุมแถว A–G ซึ่งแถว F อยู่ในช่วงนี้" },
+      { text: "แถว H", ok: false, why: "แถว H เป็นแถวเริ่มต้นของ Mezzanine ชั้น 2 (H–N)" },
+      { text: "แถว K", ok: false, why: "แถว K อยู่ในช่วง H–N ซึ่งเป็น Mezzanine ชั้น 2" },
+      { text: "แถว P", ok: false, why: "แถว P อยู่ในช่วง O–U ซึ่งเป็น Mezzanine ชั้น 3" }
+    ],
+    hint: "Mezzanine ชั้น 1 คือช่วงตัวอักษร A ถึง G"
+  },
+  {
+    category: "การแบ่งชั้น Mezzanine",
+    q: "หากต้องไปหยิบสินค้าที่โซน Mezzanine แถว 'M' จะต้องเดินขึ้นไปที่ Mezzanine ชั้นใด?",
+    options: [
+      { text: "Mezzanine ชั้น 2", ok: true, why: "ถูกต้อง! Mezzanine ชั้น 2 ครอบคลุมแถว H–N ซึ่งแถว M อยู่ในช่วงนี้" },
+      { text: "Mezzanine ชั้น 1", ok: false, why: "Mezzanine ชั้น 1 สิ้นสุดที่แถว G (A–G)" },
+      { text: "Mezzanine ชั้น 3", ok: false, why: "Mezzanine ชั้น 3 เริ่มตั้งแต่แถว O เป็นต้นไป (O–U)" },
+      { text: "อยู่นอกพื้นที่ Mezzanine", ok: false, why: "แถว M อยู่ในช่วง H–N ของ Mezzanine ชั้น 2 ครับ" }
+    ],
+    hint: "ไล่ตัวอักษร H, I, J, K, L, M, N"
+  },
+  {
+    category: "ประยุกต์รหัสจริงกับ Mezzanine",
+    q: "จากรหัสตำแหน่งในระบบจริง 'B1MS2343' (โซน Mezzanine แถว S) แถว 'S' ตรงกับพื้นที่ Mezzanine ชั้นใด?",
+    options: [
+      { text: "Mezzanine ชั้น 3", ok: true, why: "ถูกต้อง! Mezzanine ชั้น 3 ครอบคลุมแถว O–U ซึ่งแถว S อยู่ในช่วงนี้" },
+      { text: "Mezzanine ชั้น 1", ok: false, why: "Mezzanine ชั้น 1 คือแถว A–G" },
+      { text: "Mezzanine ชั้น 2", ok: false, why: "Mezzanine ชั้น 2 คือแถว H–N" },
+      { text: "ชั้น 4 (Layers 4)", ok: false, why: "อย่าสับสนระหว่าง 'ชั้นของ Mezzanine' (ดูจากแถว S → ชั้น 3) กับ Layers บนชั้นวางนะครับ" }
+    ],
+    hint: "Mezzanine ชั้น 3 คือช่วง O–U"
+  },
+  {
+    category: "การแบ่งชั้น Mezzanine (แบบสลับลำดับ)",
+    q: "หากมีรายการสินค้าบน Mezzanine ที่อยู่แถว 'N', แถว 'O' และแถว 'G' ตามลำดับ จะต้องไปที่ Mezzanine ชั้นใดบ้างตามลำดับ?",
+    options: [
+      { text: "ชั้น 2, ชั้น 3, ชั้น 1", ok: true, why: "ถูกต้อง! แถว N = ชั้น 2 (H–N), แถว O = ชั้น 3 (O–U) และแถว G = ชั้น 1 (A–G)" },
+      { text: "ชั้น 1, ชั้น 2, ชั้น 3", ok: false, why: "ลำดับแถวในโจทย์ไม่ได้เรียงจากน้อยไปมากครับ (N → O → G)" },
+      { text: "ชั้น 2, ชั้น 2, ชั้น 1", ok: false, why: "แถว O เป็นแถวเริ่มต้นของชั้น 3 (O–U) ไม่ใช่ชั้น 2 ครับ" },
+      { text: "ชั้น 3, ชั้น 3, ชั้น 2", ok: false, why: "แถว N ยังอยู่ชั้น 2 (แถวสุดท้ายของ H–N) และแถว G อยู่ชั้น 1 (แถวสุดท้ายของ A–G)" }
+    ],
+    hint: "เช็คขอบเขตตัวอักษรสุดท้ายและตัวแรกของแต่ละชั้น: A–G (ชั้น 1), H–N (ชั้น 2), O–U (ชั้น 3)"
+  },
+  {
+    category: "ประกอบรหัส Address จากโจทย์ภาษาไทย",
+    q: "คลัง 3 Mezzanine โรล P เบย์ที่ 9 ช่องที่ 3 ชั้นที่ 2 รหัสตำแหน่ง (Address) ที่ถูกต้องคือข้อใด และอยู่ Mezzanine ชั้นใด?",
+    options: [
+      { text: "B3MP0932 — Mezzanine ชั้น 3", ok: true, why: "ถูกต้อง! คลัง 3 = B3, Mezzanine = M, โรล = P, เบย์ที่ 9 = 09, ช่องที่ 3 = 3, ชั้นที่ 2 = 2 รวมเป็น B3MP0932 และแถว P อยู่ในช่วง O–U (Mezzanine ชั้น 3)" },
+      { text: "B3MP0923 — Mezzanine ชั้น 3", ok: false, why: "เลข 2 หลักสุดท้ายสลับกันครับ ช่อง (Column) 3 ต้องมาก่อนชั้น (Layers) 2 จึงต้องลงท้ายด้วย 32" },
+      { text: "B3MP0932 — Mezzanine ชั้น 2", ok: false, why: "รหัสตำแหน่งถูกต้อง แต่แถว P อยู่ในช่วง O–U ซึ่งเป็น Mezzanine ชั้น 3 ไม่ใช่ชั้น 2" },
+      { text: "B3PM0932 — Mezzanine ชั้น 3", ok: false, why: "สลับตำแหน่ง Zone กับ Roll ครับ ต้องเป็น M (Mezzanine) ก่อนแล้วค่อยตามด้วย P (โรล P)" }
+    ],
+    hint: "ประกอบทีละส่วน: WH (B3) + Zone (M) + Roll (P) + BAY (09) + Column (3) + Layers (2) แล้วเช็คแถว P ว่าอยู่ชั้นไหน"
+  }
+];
+
+let quizList = [];
+let currentIdx = 0;
+let score = 0;
+let historyLog = [];
+let answered = false;
+
+const el = id => document.getElementById(id);
+const shuffle = arr => {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+// Modal handlers
+el("openRefBtn").onclick = () => el("refModal").classList.add("open");
+el("closeRefBtn").onclick = () => el("refModal").classList.remove("open");
+el("refModal").onclick = e => { if (e.target === el("refModal")) el("refModal").classList.remove("open"); };
+
+function startQuiz() {
+  const shouldShuffle = el("shuffleToggle").checked;
+  quizList = (shouldShuffle ? shuffle(QUESTIONS) : QUESTIONS.slice()).map(item => ({
+    ...item,
+    shuffledOptions: shuffle(item.options)
+  }));
+  currentIdx = 0;
+  score = 0;
+  historyLog = [];
+  el("startScreen").classList.add("hidden");
+  el("resultScreen").classList.add("hidden");
+  el("quizScreen").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const item = quizList[currentIdx];
+  el("qCounter").textContent = `ข้อที่ ${currentIdx + 1} / ${quizList.length}`;
+  el("scoreLive").textContent = `คะแนนสะสม: ${score}`;
+  el("progressFill").style.width = `${(currentIdx / quizList.length) * 100}%`;
+  el("qCategory").textContent = item.category;
+  el("qText").textContent = item.q;
+  el("hintBox").classList.add("hidden");
+  el("hintBox").textContent = "💡 คำใบ้: " + item.hint;
+  el("hintBtn").classList.remove("hidden");
+  el("feedbackBox").classList.add("hidden");
+  el("nextBtn").classList.add("hidden");
+  el("nextBtn").textContent = currentIdx === quizList.length - 1 ? "ดูสรุปผลคะแนน →" : "ข้อถัดไป →";
+
+  const box = el("optionsBox");
+  box.innerHTML = "";
+  const letters = ["A", "B", "C", "D"];
+  item.shuffledOptions.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `<span class="opt-letter">${letters[idx]}</span><span>${opt.text}</span>`;
+    btn.onclick = () => selectAnswer(idx);
+    box.appendChild(btn);
+  });
+}
+
+function selectAnswer(chosenIdx) {
+  if (answered) return;
+  answered = true;
+  const item = quizList[currentIdx];
+  const chosen = item.shuffledOptions[chosenIdx];
+  const correctOpt = item.shuffledOptions.find(o => o.ok);
+  const btns = el("optionsBox").querySelectorAll(".option-btn");
+
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (item.shuffledOptions[i].ok) b.classList.add("correct");
+    else if (i === chosenIdx && !chosen.ok) b.classList.add("wrong");
+  });
+
+  if (chosen.ok) score++;
+  el("scoreLive").textContent = `คะแนนสะสม: ${score}`;
+  el("progressFill").style.width = `${((currentIdx + 1) / quizList.length) * 100}%`;
+
+  const fb = el("feedbackBox");
+  fb.classList.remove("hidden", "ok", "err");
+  fb.classList.add(chosen.ok ? "ok" : "err");
+  el("feedbackTitle").textContent = chosen.ok ? "✅ ถูกต้อง!" : "❌ ยังไม่ถูกครับ";
+  el("feedbackReason").textContent = chosen.ok
+    ? chosen.why
+    : `${chosen.why} — คำตอบที่ถูกคือ "${correctOpt.text}" (${correctOpt.why})`;
+
+  el("hintBtn").classList.add("hidden");
+  el("nextBtn").classList.remove("hidden");
+
+  historyLog.push({
+    q: item.q,
+    chosenText: chosen.text,
+    correctText: correctOpt.text,
+    isCorrect: chosen.ok,
+    reason: correctOpt.why
+  });
+}
+
+el("hintBtn").onclick = () => {
+  el("hintBox").classList.remove("hidden");
+  el("hintBtn").classList.add("hidden");
+};
+
+el("nextBtn").onclick = () => {
+  if (currentIdx < quizList.length - 1) {
+    currentIdx++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  el("quizScreen").classList.add("hidden");
+  el("resultScreen").classList.remove("hidden");
+  const total = quizList.length;
+  const pct = Math.round((score / total) * 100);
+  const name = el("userName").value.trim();
+
+  el("finalScore").textContent = `${score}/${total}`;
+  el("finalPct").textContent = `${pct}%`;
+
+  let msg = "ยอดเยี่ยมมาก! เข้าใจ Location และการอ่านรหัส Address ได้แม่นยำแล้ว";
+  if (pct < 60) msg = "ลองเปิดคู่มืออ้างอิงทบทวนและดูข้อที่ตอบผิด แล้วลองทำใหม่อีกครั้งนะครับ";
+  else if (pct < 85) msg = "ทำได้ดีเลยครับ! เก็บรายละเอียดข้อที่พลาดอีกนิดจะเป๊ะ 100%";
+  el("resultHeading").textContent = name ? `สรุปผลคะแนนของ ${name}` : "สรุปผลคะแนน";
+  el("resultSub").textContent = msg;
+
+  const wrongCount = historyLog.filter(h => !h.isCorrect).length;
+  el("filterAll").textContent = `ทั้งหมด (${total})`;
+  el("filterWrong").textContent = `เฉพาะข้อที่ผิด (${wrongCount})`;
+  renderReview("all");
+}
+
+function renderReview(mode) {
+  const list = el("reviewList");
+  list.innerHTML = "";
+  el("filterAll").className = `btn btn-sm ${mode === "all" ? "btn-primary" : "btn-ghost"}`;
+  el("filterWrong").className = `btn btn-sm ${mode === "wrong" ? "btn-primary" : "btn-ghost"}`;
+
+  const items = mode === "wrong" ? historyLog.filter(h => !h.isCorrect) : historyLog;
+  if (items.length === 0) {
+    list.innerHTML = `<p style="text-align:center; color:var(--success); font-weight:700; padding:18px;">🎉 ไม่มีข้อที่ตอบผิดเลย เก่งมากครับ!</p>`;
+    return;
+  }
+  items.forEach((h, i) => {
+    const div = document.createElement("div");
+    div.className = `review-item ${h.isCorrect ? "r-ok" : "r-err"}`;
+    div.innerHTML = `
+      <div class="review-q">${i + 1}. ${h.q}</div>
+      <div class="review-ans">คำตอบที่เลือก: <strong>${h.chosenText}</strong> ${h.isCorrect ? "✅" : `❌ (เฉลย: <strong>${h.correctText}</strong>)`}</div>
+      <div class="review-exp">${h.reason}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+el("filterAll").onclick = () => renderReview("all");
+el("filterWrong").onclick = () => renderReview("wrong");
+el("startBtn").onclick = startQuiz;
+el("retryBtn").onclick = () => {
+  el("resultScreen").classList.add("hidden");
+  el("startScreen").classList.remove("hidden");
+};
+
+el("copyResultBtn").onclick = () => {
+  const name = el("userName").value.trim() || "ผู้ทำแบบทดสอบ";
+  const pct = Math.round((score / quizList.length) * 100);
+  const text = `📊 ผลแบบทดสอบ Location & Address\nผู้ทำ: ${name}\nคะแนน: ${score}/${quizList.length} (${pct}%)`;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = el("toast");
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
+  }).catch(() => alert(text));
+};
+</script>
+</body>
+</html>
